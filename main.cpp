@@ -15,6 +15,16 @@ using namespace std;
 
 int main()
 {
+  // create a dynamic array of linked lists
+  int tableSize = 101;
+  Node** table = new Node*[tableSize];
+
+  // walk through the node table, set all the values to null
+  for (int i = 0; i < tableSize - 1; i++)
+    {
+      table[i] = NULL;
+    }
+  
   bool editing = true; // while editing is true, the program runs
   while (editing)
     {
@@ -59,7 +69,11 @@ int main()
 	      cin >> gpa;
 	      cin.ignore(max, '\n');
 
+	      // new student
 	      Student* student = new Student(first, last, id, gpa);
+
+	      // insert the student into the hash table
+	      
 	    }
 	  else if (strcmp(input, "random") == 0)
 	    {
@@ -97,8 +111,66 @@ int main()
 }
 
 /*
- * 
+ * This function takes in the student ID, determines the location where 
+ * the item should be inserted 
  */
-void hashFunction(int ID)
+int hash(int ID, int tableSize)
 {
+  // use modulo arithmetic to get the index
+  return ID % tableSize; // return the index/key
+}
+
+/*
+ * This function inserts a student into the table according to its key.
+ */
+void insert(Node** table, Student* student)
+{
+  // hash the student ID to get a key
+  // run through the array of linked lists
+  // if the index of the array matches the current index
+  // if current node = null, create a new node with student info
+  // if current node != null, move thru the list until current->next == null
+  // keep track of the number of nodes
+  // then set current->next to a new node with the student information in it
+}
+
+/*
+ * This function removes a node in the table according to its key.
+ */
+void remove(Node** table, int ID)
+{
+  // hash the student ID to get a key
+  // run through the array of linked lists
+  // if the index of the array matches the current index
+  // walk through the linked list in that array until you find the index
+  // delete the node
+}
+
+/*
+ * This function walks through the table and calls on printByNode for each
+ * index
+ */
+void printByIndex(Node** table)
+{
+  // walk through the entire table by index
+  // at each index, print the nodes out through recursion
+}
+
+/*
+ * This function prints out the linked list inside one slot of the table
+ */
+void printByNode(Node* nextNode, Node* startNode)
+{
+  // prints out the linked list recursively
+}
+
+/*
+ *
+ */
+void rehash(Node** table)
+{
+  // create a new table with double the slots
+  // walk through the entire old table
+  // create keys by hashing all the ids from the old table
+  //
 }
