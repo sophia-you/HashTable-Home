@@ -1,7 +1,8 @@
 #include <iostream>
-#include <string>
-#include "student.h"
+#include <cstring>
 #include <vector>
+#include <fstream>
+#include "student.h"
 #include "node.h"
 
 using namespace std;
@@ -11,7 +12,10 @@ using namespace std;
  * Date | 02/08/2024
  * Description | Hash Table. Students are either randomly generated or added
  * manually and stored in a hash table. The user has the option to print,
- * delete, etc. as well. 
+ * delete, etc. as well.
+ * 
+ * Sources
+ * https://www.softwaretestinghelp.com/random-number-generator-cpp/ 
  */
 
 // function prototypes
@@ -211,12 +215,32 @@ int main()
   */
  void generateStudents(vector<Student*> randomStudents, int numStudents)
  {
+   srand((unsigned) time(NULL));
+   float random = 0.0;
+   int ID = 1;
    for (vector<Student*>:: iterator it = randomStudents.begin(); it != randomStudents.end(); it++)
      {
-       srand((unsigned) time(NULL));
-      int random = 100000 + (rand() % 999999); // ID between 100000 and 999999
+       // generate random GPA
+      random = 1.0 + (float(rand() % 400)/100);
+      cout.precision(3);
+      cout.setf(ios::showpoint);
       cout << random << endl;
-      (*it)->setID(random);
-      cout << (*it)->getID() << endl;
+      (*it)->setGPA(random);
+      cout << "GPA " << (*it)->getGPA() << endl;
+
+      // assign ID number
+      (*it)->setID(ID);
+      ID++;
+      cout << "ID " << (*it)->getID() << endl;
+      cout << "" << endl;
+
+      // first names
+      // create a vector of firstnames
+      vector<char*> firstNames;
+      char* first = new char[25];
+
+      //ifstream first_names("first_names.txt");
+      ifstream firstNames = file.open("firstnames.txt");
+      char* input;
     }
 }
