@@ -233,14 +233,28 @@ int main()
       ID++;
       cout << "ID " << (*it)->getID() << endl;
       cout << "" << endl;
-
+     }
       // first names
       // create a vector of firstnames
       vector<char*> firstNames;
       char* first = new char[25];
-
+   
       //ifstream first_names("first_names.txt");
-      ifstream firstNames = file.open("firstnames.txt");
-      char* input;
-    }
+      ifstream inFile;
+      inFile.open("first_names.txt");
+      char* input = new char[20];
+      while (inFile >> input)
+	{
+	  char* temp = new char[20];
+	  strcpy(temp, input);
+	  //cout << temp << endl;
+	  firstNames.push_back(temp);
+	}
+
+      for (vector<char*>:: iterator it = firstNames.begin(); it != firstNames.end(); it++)
+	{
+	  cout << (*it) << endl;
+	}
+
+      //inFile.close("first_names.txt");
 }
