@@ -20,9 +20,9 @@ using namespace std;
 
 // function prototypes
 int hashFunction(int ID, int tableSize);
-void insert(Node** table, Student* student, int tableSize);
+void insert(Node** &table, Student* student, int tableSize);
 void remove(Node** table, int ID);
-void printByIndex(Node** table);
+void printByIndex(Node** table, int tableSize);
 void printByNode(Node* nextNode, Node* startNode);
 void rehash(Node** table, Node** newtable);
 void generateStudents(vector<Student*> randomStudents, int numStudents);
@@ -56,6 +56,7 @@ int main()
        int length = strlen(input);
        input[length + 1] = '\0';
 
+       // ADD A STUDENT
        if (strcmp(input, "add") == 0)
  	{
  	  cout << "To enter a student manually, type 'manual.' To generate a random student, type 'random.'" << endl;
@@ -124,6 +125,8 @@ int main()
  	      cout << "command not found" << endl;
  	    }
  	}
+
+       // REMOVE A STUDENT
        else if (strcmp(input, "delete") == 0)
  	{
  	  int id = 0;
@@ -134,11 +137,16 @@ int main()
  	  cout << "Student removed. " << endl;
  	  cout << "" << endl;
  	}
+
+       // PRINT STUDENT ROSTER
        else if (strcmp(input, "print") == 0)
  	{
  	  // prints student roster
+	  printByIndex(table, tableSize);
 
  	}
+
+       // EXIT PROGRAM
        else if (strcmp(input, "quit") == 0)
  	{
  	  editing = false;
@@ -164,7 +172,7 @@ int main()
  /*
   * This function inserts a student into the table according to its key.
   */
-void insert(Node** table, Student* student, int tableSize)
+void insert(Node** &table, Student* student, int tableSize)
  {
    // hash the student ID to get a key
    int searchKey = hashFunction(student->getID(), tableSize);
@@ -188,7 +196,18 @@ void insert(Node** table, Student* student, int tableSize)
 	   else if (table[i] != NULL)
 	     {
 	       cout << "collision detected" << endl;
+	       
 	       // run through the linked list until you find a null node
+	       Node* current = table[i];
+	       while (current->getNext() != NULL)
+		 {
+		   current = current->getNext();
+		 }
+
+	       // when you get to the end of the linked list, create a new node
+	       Node* node = new Node(student);
+	       current->setNext(node);
+	       cout << (current->getNext())->getStudent()->getFirst() << endl;
 	     }
 	 }
      }
@@ -215,10 +234,15 @@ void insert(Node** table, Student* student, int tableSize)
   * This function walks through the table and calls on printByNode for each
   * index
   */
- void printByIndex(Node** table)
+void printByIndex(Node** table, int tableSize)
  {
    // walk through the entire table by index
-   // at each index, print the nodes out through recursion
+   for (int i = 0; i < tableSize; i++)
+     {
+       // print the linked list in each slot thru recursion
+       printByNode(table[i], table[i]);
+     }
+
  }
 
  /*
@@ -227,6 +251,22 @@ void insert(Node** table, Student* student, int tableSize)
  void printByNode(Node* nextNode, Node* startNode)
  {
    // prints out the linked list recursively
+   // credit from my own linked lists project
+
+  if (nextNode != NULL)
+    {
+      Student* student = nextNode->getStudent();
+      cout.precision(3);
+      cout.setf(ios::showpoint);
+      
+      // print out the student info held inside the current node
+      cout << student->getFirst() << " " << student->getLast() << ", ID " << student->getID() << ", GPA " << student->getGPA() << endl;
+      cout << "" << endl;
+      
+      // call the printNode function (recursively) on the next node in the list
+      printByNode(nextNode->getNext(), startNode);
+    }
+
  }
 
  /*
