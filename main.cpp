@@ -19,8 +19,8 @@ using namespace std;
  */
 
 // function prototypes
-int hash(int ID, int tableSize);
-void insert(Node** table, Student* student);
+int hashFunction(int ID, int tableSize);
+void insert(Node** table, Student* student, int tableSize);
 void remove(Node** table, int ID);
 void printByIndex(Node** table);
 void printByNode(Node* nextNode, Node* startNode);
@@ -31,8 +31,9 @@ int main()
 {
    // create a dynamic array of linked lists
    int tableSize = 101;
-   Node** table = new Node*[tableSize];
+   Node** table = new Node*[tableSize]; // an array of node pointers
 
+   
    // walk through the node table, set all the values to null
    for (int i = 0; i < tableSize - 1; i++)
      {
@@ -87,6 +88,7 @@ int main()
  	      Student* student = new Student(first, last, id, gpa);
 
  	      // insert the student into the hash table
+	      insert(table, student, tableSize);
 	      
  	    }
  	  else if (strcmp(input, "random") == 0)
@@ -106,11 +108,16 @@ int main()
  		{
  		  Student* student = new Student();
  		  randomStudents.push_back(student);
- 		  cout << "student " << i << endl;
  		}
-	      
+
+	      cout << "" << endl;
+
+	      // create and store the students
  	      generateStudents(randomStudents, numStudents);
-	      
+	      for (vector<Student*>:: iterator it = randomStudents.begin(); it != randomStudents.end(); it++)
+		{
+		  insert(table, (*it), tableSize);
+		}
  	    }
  	  else
  	    {
@@ -148,7 +155,7 @@ int main()
   * This function takes in the student ID, determines the location where 
   * the item should be inserted 
   */
- int hash(int ID, int tableSize)
+ int hashFunction(int ID, int tableSize)
  {
    // use modulo arithmetic to get the index
    return ID % tableSize; // return the index/key
@@ -157,10 +164,34 @@ int main()
  /*
   * This function inserts a student into the table according to its key.
   */
- void insert(Node** table, Student* student)
+void insert(Node** table, Student* student, int tableSize)
  {
    // hash the student ID to get a key
+   int searchKey = hashFunction(student->getID(), tableSize);
+   cout << searchKey << endl;
+   
    // run through the array of linked lists
+   for (int i = 0; i < tableSize; i++)
+     {
+       // if the index of the array matches the search key
+       if (searchKey == i)
+	 {
+	   // no collision detected
+	   if (table[i] == NULL)
+	     {
+	       cout << "empty slot" << endl;
+	       Node* head = new Node(student);
+	       table[i] = head;
+	       cout << (table[i])->getStudent()->getFirst() << endl;
+	     }
+	   // collision detected
+	   else if (table[i] != NULL)
+	     {
+	       cout << "collision detected" << endl;
+	       // run through the linked list until you find a null node
+	     }
+	 }
+     }
    // if the index of the array matches the current index
     // if current node = null, create a new node with student info
    // if current node != null, move thru the list until current->next == null
@@ -216,30 +247,16 @@ int main()
  void generateStudents(vector<Student*> randomStudents, int numStudents)
  {
    srand((unsigned) time(NULL));
-   float random = 0.0;
+   float randomGPA = 0.0;
+   int randomNames = 0;
    int ID = 1;
-   for (vector<Student*>:: iterator it = randomStudents.begin(); it != randomStudents.end(); it++)
-     {
-       // generate random GPA
-      random = 1.0 + (float(rand() % 400)/100);
-      cout.precision(3);
-      cout.setf(ios::showpoint);
-      cout << random << endl;
-      (*it)->setGPA(random);
-      cout << "GPA " << (*it)->getGPA() << endl;
 
-      // assign ID number
-      (*it)->setID(ID);
-      ID++;
-      cout << "ID " << (*it)->getID() << endl;
-      cout << "" << endl;
-     }
-      // first names
-      // create a vector of firstnames
+   // FIRST NAMES
+      // create a vector of first names
       vector<char*> firstNames;
       char* first = new char[25];
-   
-      //ifstream first_names("first_names.txt");
+
+      // CREDIT TO MR. GALBRAITH
       ifstream inFile;
       inFile.open("first_names.txt");
       char* input = new char[20];
@@ -247,14 +264,62 @@ int main()
 	{
 	  char* temp = new char[20];
 	  strcpy(temp, input);
-	  //cout << temp << endl;
 	  firstNames.push_back(temp);
 	}
 
+      int numFirstNames = 0; // keeps track of the number of first names in the file
       for (vector<char*>:: iterator it = firstNames.begin(); it != firstNames.end(); it++)
 	{
-	  cout << (*it) << endl;
+	  numFirstNames++;
+	}
+      
+      inFile.close();
+
+      // LAST NAMES
+      vector<char*> lastNames;
+      char* last = new char[50];
+      int numLastNames = 0;
+      
+      inFile.open("last_names.txt");
+      char* input2 = new char[50];
+      while (inFile >> input2)
+	{
+	  char* temp = new char[50];
+	  strcpy(temp, input2);
+	  lastNames.push_back(temp);
 	}
 
-      //inFile.close("first_names.txt");
+      for (vector<char*>:: iterator it = lastNames.begin(); it != lastNames.end(); it++)
+	{
+	  numLastNames++;
+	}
+
+      inFile.close();
+   
+   for (vector<Student*>:: iterator it = randomStudents.begin(); it != randomStudents.end(); it++)
+     {
+       // student first name
+       randomNames = 1 + (rand() % numFirstNames);
+       (*it)->setFirst(firstNames[randomNames]);
+
+       // last names
+       randomNames = 1 + (rand() % numLastNames);
+       (*it)->setLast(lastNames[randomNames]);
+
+       // print full name
+       cout << (*it)->getFirst() << " " << (*it)->getLast() << endl;
+       
+       // generate random GPA
+      randomGPA = 1.0 + (float(rand() % 400)/100);
+      cout.precision(3);
+      cout.setf(ios::showpoint);
+      (*it)->setGPA(randomGPA);
+      cout << "GPA " << (*it)->getGPA() << endl;
+
+      // assign ID number
+      (*it)->setID(ID);
+      ID++;
+      cout << "ID " << (*it)->getID() << endl;
+      cout << "" << endl;
+     }   
 }
