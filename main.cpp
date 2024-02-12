@@ -21,7 +21,7 @@ using namespace std;
 // function prototypes
 int hashFunction(int ID, int tableSize);
 void insert(Node** &table, Student* student, int tableSize);
-void remove(Node** table, int ID);
+void remove(int id, Node* prevNode, Node* currentNode, Node* &startNode);
 void printByIndex(Node** table, int tableSize);
 void printByNode(Node* nextNode, Node* startNode);
 void rehash(Node** table, Node** newtable);
@@ -50,7 +50,6 @@ int main()
        cout << "Type 'add' to add a student." << endl;
        cout << "Type 'delete' to delete a student." << endl;
        cout << "Type 'print' to print the student roster." << endl;
-       cout << "type 'average' to print the school's average GPA." << endl;
        cout << "Type 'quit' to exit editing mode." << endl;
        cin.getline(input, max);
        int length = strlen(input);
@@ -133,7 +132,15 @@ int main()
  	  cout << "enter the ID of the student you want to delete." << endl;
  	  cin >> id;
  	  cin.ignore(25, '\n');
- 	  // remove
+	  int searchKey = hashFunction(id, tableSize);
+	  for (int i = 0; i < tableSize; i++)
+	    {
+	      if (i == searchKey)
+		{
+		  remove(id, table[i], table[i], table[i]);
+		}
+	    }
+	  // remove function
  	  cout << "Student removed. " << endl;
  	  cout << "" << endl;
  	}
@@ -141,6 +148,8 @@ int main()
        // PRINT STUDENT ROSTER
        else if (strcmp(input, "print") == 0)
  	{
+	  cout << "" << endl;
+	  
  	  // prints student roster
 	  printByIndex(table, tableSize);
 
@@ -211,23 +220,44 @@ void insert(Node** &table, Student* student, int tableSize)
 	     }
 	 }
      }
-   // if the index of the array matches the current index
-    // if current node = null, create a new node with student info
-   // if current node != null, move thru the list until current->next == null
-   // keep track of the number of nodes
-   // then set current->next to a new node with the student information in it
  }
 
  /*
   * This function removes a node in the table according to its key.
   */
- void remove(Node** table, int ID)
+void remove(int id, Node* prevNode, Node* currentNode, Node* &startNode)
  {
-   // hash the student ID to get a key
-   // run through the array of linked lists
-   // if the index of the array matches the current index
-   // walk through the linked list in that array until you find the index
-   // delete the node
+     // the student has been found
+  if (currentNode != NULL && currentNode->getStudent()->getID() == id)
+    {
+      if (currentNode == startNode) // if the id is the first in the list
+	{
+	  startNode = currentNode->getNext(); // set the head to the next node
+	}
+      else if (currentNode->getNext() != NULL) // the node is in the middle
+	{
+	  // previous node now connects to the node after currentNode
+	  prevNode->setNext(currentNode->getNext());
+	}
+      else if (currentNode->getNext() == NULL) // end of list
+	{
+	  prevNode->setNext(NULL);
+	}
+      
+      delete currentNode;
+    }
+  else
+    {
+      if (currentNode->getNext() != NULL)
+	{
+	  remove(id, currentNode, currentNode->getNext(), startNode);
+	}
+      else // id not found
+	{
+	  cout << "ID not found." << endl;
+	  cout << "" << endl;
+	}
+    }
  }
 
  /*
@@ -339,11 +369,11 @@ void printByIndex(Node** table, int tableSize)
    for (vector<Student*>:: iterator it = randomStudents.begin(); it != randomStudents.end(); it++)
      {
        // student first name
-       randomNames = 1 + (rand() % numFirstNames);
+       randomNames = (rand() % numFirstNames);
        (*it)->setFirst(firstNames[randomNames]);
 
        // last names
-       randomNames = 1 + (rand() % numLastNames);
+       randomNames = (rand() % numLastNames);
        (*it)->setLast(lastNames[randomNames]);
 
        // print full name
